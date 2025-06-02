@@ -7,83 +7,169 @@
 <body>
 <script type="text/javascript">
 (function() {
-    'use strict';
-    
-    // First, aggressively remove any existing Voiceflow
-    function removeExistingVoiceflow() {
-        // Remove existing voiceflow elements
-        const existingElements = document.querySelectorAll('#voiceflow-chat, [id*="voiceflow"], [class*="voiceflow"]');
-        existingElements.forEach(el => el.remove());
-        
-        // Remove existing scripts
-        const existingScripts = document.querySelectorAll('script[src*="voiceflow"], script[src*="cdn.voiceflow"]');
-        existingScripts.forEach(script => script.remove());
-        
-        // Clear any existing voiceflow objects
-        if (window.voiceflow) {
-            delete window.voiceflow;
-        }
+    // Detect if user is on mobile device
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               window.innerWidth <= 768;
     }
 
-    // Remove existing stuff immediately
-    removeExistingVoiceflow();
-
+    // Inject CSS styles
     const styles = `
-        /* Hide any existing voiceflow widgets */
-        #voiceflow-chat, [id*="voiceflow"]:not(#avantGardeVoiceflowEmbed) { 
-            display: none !important; 
-            visibility: hidden !important;
-            opacity: 0 !important;
-        }
+        /* Hide the default Voiceflow widget */
+        #voiceflow-chat { display: none !important; }
 
-        /* Custom button */
+        /* Custom animated button - refined design */
         .avant-garde-chat-button {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            width: 70px;
-            height: 70px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
             background: linear-gradient(135deg, #c41e3a 0%, #dc143c 50%, #b22222 100%);
-            border: none;
+            background-size: 200% 200%;
+            animation: avant-garde-redGradientShift 6s ease infinite, avant-garde-pulse 3s ease-in-out infinite;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
-            box-shadow: 0 8px 32px rgba(196, 30, 58, 0.4);
+            box-shadow: 0 8px 32px rgba(196, 30, 58, 0.3), 
+                        0 4px 16px rgba(220, 20, 60, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 999999;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: visible;
+            backdrop-filter: blur(10px);
         }
 
-        .avant-garde-chat-button:hover {
-            transform: scale(1.1);
-        }
-
-        /* Shield logo */
+        /* Shield logo with refined styling - bigger */
         .avant-garde-shield {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             background-image: url('https://raw.githubusercontent.com/jess-heaton/avg/main/avant-garde-logo.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2)) brightness(1.1);
+            animation: avant-garde-shieldPulse 4s ease-in-out infinite;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Desktop widget container */
+        /* Shield stabilizes on hover */
+        .avant-garde-chat-button:hover .avant-garde-shield {
+            animation: none;
+            transform: scale(1.1);
+        }
+
+        /* Hover effects - refined and smooth */
+        .avant-garde-chat-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(196, 30, 58, 0.4), 
+                        0 6px 20px rgba(220, 20, 60, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Stop all animations when widget is open */
+        .avant-garde-chat-button.widget-open {
+            animation: none !important;
+        }
+
+        .avant-garde-chat-button.widget-open .avant-garde-shield {
+            animation: none !important;
+            transform: scale(1.1);
+        }
+
+        .avant-garde-chat-button.widget-open .avant-garde-pulse-ring {
+            animation: none !important;
+        }
+
+        /* Hide text when widget is open with smoother transition */
+        .avant-garde-chat-button.widget-open .avant-garde-book-now-text {
+            opacity: 0;
+            transform: translateX(15px);
+        }
+
+        /* Text label - tighter pill shape */
+        .avant-garde-book-now-text {
+            position: absolute;
+            right: 80px;
+            background: linear-gradient(135deg, #c41e3a 0%, #dc143c 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            white-space: nowrap;
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(196, 30, 58, 0.25),
+                        0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Chat icon inside the text */
+        .avant-garde-book-now-text::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            flex-shrink: 0;
+        }
+
+        /* Text moves subtly when button is hovered */
+        .avant-garde-chat-button:hover .avant-garde-book-now-text {
+            transform: translateX(-3px);
+        }
+
+        /* Refined pulse ring */
+        .avant-garde-pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(196, 30, 58, 0.3);
+            animation: avant-garde-pulseRing 3s ease-out infinite;
+        }
+
+        /* Ripple effect on click */
+        .avant-garde-ripple {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: avant-garde-ripple 0.8s ease-out;
+        }
+
+        /* The chat widget container - only for desktop */
         .avant-garde-chat-widget-container {
             position: fixed;
             bottom: 120px;
             right: 30px;
-            width: 400px;
-            height: 650px;
-            background: white;
+            width: min(400px, calc(100vw - 60px));
+            height: min(650px, calc(100vh - 140px));
+            max-height: calc(100vh - 140px);
+            background: transparent;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(196, 30, 58, 0.3), 
+                        0 10px 30px rgba(196, 30, 58, 0.2),
+                        0 0 40px rgba(220, 20, 60, 0.15);
             opacity: 0;
             visibility: hidden;
             transform: translateY(20px) scale(0.95);
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             z-index: 999998;
+            overflow: visible;
         }
 
         .avant-garde-chat-widget-container.open {
@@ -92,196 +178,292 @@
             transform: translateY(0) scale(1);
         }
 
-        /* Chat content */
+        /* Voiceflow embed container */
         .avant-garde-chat-content {
             height: 100%;
+            position: relative;
             border-radius: 20px;
             overflow: hidden;
-            position: relative;
         }
 
-        /* Close button */
-        .avant-garde-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background: #c41e3a;
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 1000001;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Animations */
+        @keyframes avant-garde-redGradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* MOBILE STYLES - FULL SCREEN TAKEOVER */
-        @media (max-width: 767px) {
+        @keyframes avant-garde-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes avant-garde-shieldPulse {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 0.9;
+            }
+            50% { 
+                transform: scale(1.15) rotate(5deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes avant-garde-ripple {
+            to { 
+                transform: scale(4); 
+                opacity: 0; 
+            }
+        }
+
+        @keyframes avant-garde-pulseRing {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes avant-garde-attentionGrab {
+            0% { transform: scale(1) rotate(0deg); }
+            10% { transform: scale(1.3) rotate(-10deg); }
+            20% { transform: scale(1.3) rotate(10deg); }
+            30% { transform: scale(1.3) rotate(-10deg); }
+            40% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .avant-garde-attention-grab {
+            animation: avant-garde-attentionGrab 1.5s ease-in-out !important;
+        }
+
+        /* Mobile adjustments - keep button size decent */
+        @media (max-width: 768px) {
+            .avant-garde-chat-button {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .avant-garde-shield {
+                width: 32px;
+                height: 32px;
+            }
+
+            .avant-garde-book-now-text {
+                font-size: 12px;
+                padding: 6px 12px;
+                right: 70px;
+            }
+
+            /* Hide the custom chat container on mobile */
             .avant-garde-chat-widget-container {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                border-radius: 0 !important;
-                z-index: 2147483647 !important; /* Maximum z-index */
+                display: none !important;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .avant-garde-chat-button {
+                width: 55px;
+                height: 55px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .avant-garde-shield {
+                width: 28px;
+                height: 28px;
             }
 
-            .avant-garde-chat-content {
-                border-radius: 0 !important;
-                height: 100vh !important;
-                width: 100vw !important;
+            .avant-garde-book-now-text {
+                font-size: 11px;
+                padding: 5px 10px;
+                right: 65px;
             }
+        }
 
-            .avant-garde-close-btn {
-                position: fixed !important;
-                top: 20px !important;
-                right: 20px !important;
-                width: 50px !important;
-                height: 50px !important;
-                font-size: 24px !important;
-                z-index: 2147483647 !important; /* Maximum z-index */
-                background: rgba(196, 30, 58, 0.9) !important;
-                backdrop-filter: blur(10px);
-            }
-
-            /* Hide body scroll when widget open */
-            body.widget-open {
-                overflow: hidden !important;
-                position: fixed !important;
-                width: 100% !important;
+        /* Large screens */
+        @media (min-width: 1200px) {
+            .avant-garde-chat-widget-container {
+                width: 420px;
+                height: 700px;
             }
         }
     `;
 
-    // Inject styles
+    // Inject styles into head
     const styleSheet = document.createElement('style');
     styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
 
-    function createWidget() {
-        // Create button
+    // Create HTML elements
+    function createElements() {
+        // Custom Animated Button
         const button = document.createElement('button');
         button.className = 'avant-garde-chat-button';
         button.id = 'avantGardeChatBtn';
         
+        const pulseRing = document.createElement('span');
+        pulseRing.className = 'avant-garde-pulse-ring';
+        
         const shield = document.createElement('div');
         shield.className = 'avant-garde-shield';
+        
+        const bookNowText = document.createElement('span');
+        bookNowText.className = 'avant-garde-book-now-text';
+        bookNowText.textContent = 'Chat here now!';
+        
+        button.appendChild(pulseRing);
         button.appendChild(shield);
+        button.appendChild(bookNowText);
 
-        // Create widget container
-        const container = document.createElement('div');
-        container.className = 'avant-garde-chat-widget-container';
-        container.id = 'avantGardeChatContainer';
-
-        // Create close button
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'avant-garde-close-btn';
-        closeBtn.innerHTML = '×';
-        closeBtn.id = 'avantGardeCloseBtn';
-
-        // Create content area
-        const content = document.createElement('div');
-        content.className = 'avant-garde-chat-content';
-        content.id = 'avantGardeVoiceflowEmbed';
-
-        container.appendChild(closeBtn);
-        container.appendChild(content);
-
-        document.body.appendChild(button);
-        document.body.appendChild(container);
-
-        return { button, container, closeBtn, content };
-    }
-
-    function initializeEvents(elements) {
-        const { button, container, closeBtn } = elements;
-        let isOpen = false;
-
-        function toggleWidget() {
-            isOpen = !isOpen;
-            container.classList.toggle('open', isOpen);
+        // Chat Widget Container (only for desktop)
+        if (!isMobileDevice()) {
+            const chatContainer = document.createElement('div');
+            chatContainer.className = 'avant-garde-chat-widget-container';
+            chatContainer.id = 'avantGardeChatContainer';
             
-            // Mobile: prevent body scroll
-            if (window.innerWidth <= 767) {
-                document.body.classList.toggle('widget-open', isOpen);
-            }
+            const chatContent = document.createElement('div');
+            chatContent.className = 'avant-garde-chat-content';
+            chatContent.id = 'avantGardeVoiceflowEmbed';
+            
+            chatContainer.appendChild(chatContent);
+            document.body.appendChild(chatContainer);
         }
 
-        button.addEventListener('click', toggleWidget);
-        closeBtn.addEventListener('click', toggleWidget);
+        // Add button to body
+        document.body.appendChild(button);
+    }
 
-        // Close on outside click (desktop only)
-        if (window.innerWidth > 767) {
+    // Initialize functionality
+    function initializeFunctionality() {
+        const customBtn = document.getElementById('avantGardeChatBtn');
+        const chatContainer = document.getElementById('avantGardeChatContainer');
+        let isOpen = false;
+        const isMobile = isMobileDevice();
+
+        function toggleChat() {
+            if (isMobile) {
+                // On mobile, trigger the original Voiceflow widget
+                if (window.voiceflow && window.voiceflow.chat) {
+                    // Show the original Voiceflow widget
+                    const voiceflowWidget = document.getElementById('voiceflow-chat');
+                    if (voiceflowWidget) {
+                        voiceflowWidget.style.display = 'block !important';
+                    }
+                    // Use Voiceflow's open method if available
+                    if (window.voiceflow.chat.open) {
+                        window.voiceflow.chat.open();
+                    }
+                }
+            } else {
+                // Desktop behavior - use custom embedded widget
+                isOpen = !isOpen;
+                if (chatContainer) {
+                    chatContainer.classList.toggle('open', isOpen);
+                    
+                    // Add/remove widget-open class to stop animations when open
+                    customBtn.classList.toggle('widget-open', isOpen);
+                }
+            }
+            
+            // Add ripple effect to button
+            const ripple = document.createElement('span');
+            ripple.className = 'avant-garde-ripple';
+            customBtn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 800);
+        }
+
+        // Open/close chat when custom button is clicked
+        customBtn.addEventListener('click', toggleChat);
+
+        // Close when clicking outside (desktop only)
+        if (!isMobile) {
             document.addEventListener('click', function(e) {
-                if (isOpen && !container.contains(e.target) && !button.contains(e.target)) {
-                    toggleWidget();
+                if (isOpen && chatContainer && !chatContainer.contains(e.target) && !customBtn.contains(e.target)) {
+                    toggleChat();
                 }
             });
         }
 
-        // ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && isOpen) {
-                toggleWidget();
+        // Periodic attention animation
+        setInterval(() => {
+            if (!isOpen) {
+                customBtn.classList.add('avant-garde-attention-grab');
+                setTimeout(() => {
+                    customBtn.classList.remove('avant-garde-attention-grab');
+                }, 1500);
             }
-        });
+        }, 15000);
+
+        // Escape key to close (desktop only)
+        if (!isMobile) {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && isOpen) {
+                    toggleChat();
+                }
+            });
+        }
     }
 
+    // Load Voiceflow
     function loadVoiceflow() {
         const script = document.createElement('script');
         script.src = 'https://cdn.voiceflow.com/widget-next/bundle.mjs';
         script.type = 'text/javascript';
         script.onload = function() {
-            if (window.voiceflow && window.voiceflow.chat) {
+            const isMobile = isMobileDevice();
+            
+            if (isMobile) {
+                // On mobile, load the standard Voiceflow widget (hidden by default)
                 window.voiceflow.chat.load({
                     verify: { projectID: '681be03ddbdfd714348146a6' },
                     url: 'https://general-runtime.voiceflow.com',
                     versionID: 'production',
                     voice: {
                         url: "https://runtime-api.voiceflow.com"
-                    },
-                    render: {
-                        mode: 'embedded',
-                        target: document.getElementById('avantGardeVoiceflowEmbed')
                     }
                 });
+            } else {
+                // On desktop, load embedded version
+                const embedTarget = document.getElementById('avantGardeVoiceflowEmbed');
+                if (embedTarget) {
+                    window.voiceflow.chat.load({
+                        verify: { projectID: '681be03ddbdfd714348146a6' },
+                        url: 'https://general-runtime.voiceflow.com',
+                        versionID: 'production',
+                        voice: {
+                            url: "https://runtime-api.voiceflow.com"
+                        },
+                        render: {
+                            mode: 'embedded',
+                            target: embedTarget
+                        }
+                    });
+                }
             }
-        };
-        script.onerror = function() {
-            console.error('Failed to load Voiceflow');
         };
         document.head.appendChild(script);
     }
 
-    function init() {
-        // Remove any existing stuff again
-        removeExistingVoiceflow();
-        
-        // Wait a bit then create our widget
-        setTimeout(() => {
-            const elements = createWidget();
-            initializeEvents(elements);
-            loadVoiceflow();
-        }, 100);
-    }
-
-    // Initialize when ready
+    // Initialize everything when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            createElements();
+            initializeFunctionality();
+            loadVoiceflow();
+        });
     } else {
-        init();
+        createElements();
+        initializeFunctionality();
+        loadVoiceflow();
     }
-
-    // Also try to clean up any voiceflow that loads after us
-    setTimeout(removeExistingVoiceflow, 2000);
-    setTimeout(removeExistingVoiceflow, 5000);
 })();
 </script>
 </body>
