@@ -7,7 +7,7 @@
 <body>
 <script type="text/javascript">
 (function() {
-    // Inject CSS styles
+    // Inject CSS styles with mobile optimizations
     const styles = `
         /* Hide the default Voiceflow widget */
         #voiceflow-chat { display: none !important; }
@@ -37,7 +37,7 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Shield logo with refined styling - bigger */
+        /* Shield logo with refined styling */
         .avant-garde-shield {
             width: 42px;
             height: 42px;
@@ -55,8 +55,6 @@
             animation: none;
             transform: scale(1.1);
         }
-
-        /* Remove the warrior icon - replaced by shield animation */
 
         /* Hover effects - refined and smooth */
         .avant-garde-chat-button:hover {
@@ -80,7 +78,7 @@
             animation: none !important;
         }
 
-        /* Hide text when widget is open with smoother transition */
+        /* Hide text when widget is open */
         .avant-garde-chat-button.widget-open .avant-garde-book-now-text {
             opacity: 0;
             transform: translateX(15px);
@@ -136,8 +134,6 @@
             animation: avant-garde-pulseRing 3s ease-out infinite;
         }
 
-        /* Remove construction emoji functionality */
-
         /* Ripple effect on click */
         .avant-garde-ripple {
             position: absolute;
@@ -149,7 +145,34 @@
             animation: avant-garde-ripple 0.8s ease-out;
         }
 
-        /* The chat widget container - responsive positioning */
+        /* Custom close button for mobile */
+        .avant-garde-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(196, 30, 58, 0.9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000001;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .avant-garde-close-btn:hover {
+            background: rgba(196, 30, 58, 1);
+            transform: scale(1.1);
+        }
+
+        /* The chat widget container - enhanced mobile positioning */
         .avant-garde-chat-widget-container {
             position: fixed;
             bottom: 120px;
@@ -197,13 +220,6 @@
             100% { transform: scale(1); }
         }
 
-        @keyframes avant-garde-wiggle {
-            0%, 100% { transform: rotate(-8deg) scale(1.1); }
-            25% { transform: rotate(8deg) scale(1.1); }
-            50% { transform: rotate(-8deg) scale(1.1); }
-            75% { transform: rotate(8deg) scale(1.1); }
-        }
-
         @keyframes avant-garde-shieldPulse {
             0%, 100% { 
                 transform: scale(1) rotate(0deg);
@@ -214,8 +230,6 @@
                 opacity: 1;
             }
         }
-
-        /* Remove unused iconWiggle animation */
 
         @keyframes avant-garde-ripple {
             to { 
@@ -235,8 +249,6 @@
             }
         }
 
-        /* Remove unused float animation */
-
         @keyframes avant-garde-attentionGrab {
             0% { transform: scale(1) rotate(0deg); }
             10% { transform: scale(1.3) rotate(-10deg); }
@@ -250,51 +262,111 @@
             animation: avant-garde-attentionGrab 1.5s ease-in-out !important;
         }
 
-        /* Mobile and small screen adjustments */
-        @media (max-width: 768px) {
+        /* MOBILE OPTIMIZATIONS */
+        
+        /* Mobile portrait - full screen takeover */
+        @media (max-width: 767px) {
             .avant-garde-chat-button {
-                width: 60px;
-                height: 60px;
+                width: 70px;
+                height: 70px;
+                bottom: 25px;
+                right: 25px;
+                z-index: 999999; /* Ensure it's above the mobile menu */
+            }
+            
+            .avant-garde-shield {
+                width: 40px;
+                height: 40px;
+            }
+
+            /* Mobile chat container - FULL SCREEN */
+            .avant-garde-chat-widget-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                z-index: 1000000; /* Above everything including mobile menu */
+                background: white;
+            }
+
+            /* Hide text label on mobile to save space */
+            .avant-garde-book-now-text {
+                display: none;
+            }
+
+            .avant-garde-chat-content {
+                border-radius: 0;
+                height: 100%;
+                width: 100%;
+            }
+
+            /* Enhanced close button for mobile - positioned in top right */
+            .avant-garde-close-btn {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                z-index: 1000001; /* Ensure it's above everything */
+                background: rgba(196, 30, 58, 0.95);
+                backdrop-filter: blur(10px);
+            }
+        }
+
+        /* Mobile landscape and small tablets - full screen */
+        @media (max-width: 1024px) and (orientation: landscape) {
+            .avant-garde-chat-widget-container {
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        /* Very small screens - still full screen */
+        @media (max-width: 480px) {
+            .avant-garde-chat-widget-container {
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .avant-garde-chat-content {
+                border-radius: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .avant-garde-chat-button {
+                width: 65px;
+                height: 65px;
                 bottom: 20px;
                 right: 20px;
             }
             
             .avant-garde-shield {
-                width: 30px;
-                height: 30px;
+                width: 35px;
+                height: 35px;
             }
 
-            .avant-garde-chat-widget-container {
-                width: calc(100vw - 40px);
-                height: calc(100vh - 100px);
-                right: 20px;
-                bottom: 90px;
-                border-radius: 16px;
-            }
-
-            .avant-garde-book-now-text {
-                font-size: 12px;
-                padding: 6px 12px;
-                right: 70px;
-            }
-
-            .avant-garde-chat-content {
-                border-radius: 16px;
-            }
-        }
-
-        /* Extra small screens */
-        @media (max-width: 480px) {
-            .avant-garde-chat-widget-container {
-                width: calc(100vw - 20px);
-                height: calc(100vh - 80px);
-                right: 10px;
-                bottom: 70px;
-                border-radius: 12px;
-            }
-
-            .avant-garde-chat-content {
-                border-radius: 12px;
+            .avant-garde-close-btn {
+                top: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
             }
         }
 
@@ -305,12 +377,43 @@
                 height: 700px;
             }
         }
+
+        /* Ensure proper stacking with existing page elements */
+        .avant-garde-chat-widget-container,
+        .avant-garde-chat-button {
+            z-index: 999999;
+        }
+
+        /* Override any conflicting styles from the existing site */
+        .avant-garde-chat-button,
+        .avant-garde-chat-widget-container,
+        .avant-garde-close-btn {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Responsive menu compatibility */
+        @media only screen and (max-width: 767px) {
+            /* Ensure widget doesn't interfere with responsive menu */
+            body.cbp-spmenu-push-toright .avant-garde-chat-widget-container.open {
+                transform: translateX(-80%) translateY(0) scale(1);
+            }
+            
+            body.cbp-spmenu-push-toleft .avant-garde-chat-widget-container.open {
+                transform: translateX(80%) translateY(0) scale(1);
+            }
+        }
     `;
 
     // Inject styles into head
     const styleSheet = document.createElement('style');
     styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
+
+    // Detect mobile device
+    function isMobile() {
+        return window.innerWidth <= 767 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
 
     // Create HTML elements
     function createElements() {
@@ -325,13 +428,16 @@
         const shield = document.createElement('div');
         shield.className = 'avant-garde-shield';
         
-        const bookNowText = document.createElement('span');
-        bookNowText.className = 'avant-garde-book-now-text';
-        bookNowText.textContent = 'Chat here now!';
+        // Only show text on desktop
+        if (!isMobile()) {
+            const bookNowText = document.createElement('span');
+            bookNowText.className = 'avant-garde-book-now-text';
+            bookNowText.textContent = 'Chat here now!';
+            button.appendChild(bookNowText);
+        }
         
         button.appendChild(pulseRing);
         button.appendChild(shield);
-        button.appendChild(bookNowText);
 
         // Chat Widget Container
         const chatContainer = document.createElement('div');
@@ -341,6 +447,15 @@
         const chatContent = document.createElement('div');
         chatContent.className = 'avant-garde-chat-content';
         chatContent.id = 'avantGardeVoiceflowEmbed';
+        
+        // Add close button for mobile
+        if (isMobile()) {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'avant-garde-close-btn';
+            closeBtn.innerHTML = '×';
+            closeBtn.id = 'avantGardeCloseBtn';
+            chatContainer.appendChild(closeBtn);
+        }
         
         chatContainer.appendChild(chatContent);
 
@@ -353,6 +468,7 @@
     function initializeFunctionality() {
         const customBtn = document.getElementById('avantGardeChatBtn');
         const chatContainer = document.getElementById('avantGardeChatContainer');
+        const closeBtn = document.getElementById('avantGardeCloseBtn');
         let isOpen = false;
 
         function toggleChat() {
@@ -362,7 +478,19 @@
             // Add/remove widget-open class to stop animations when open
             customBtn.classList.toggle('widget-open', isOpen);
             
-            // Add ripple effect to button
+            // Prevent body scroll on mobile when chat is open
+            if (isMobile()) {
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+                // Also hide the mobile menu if it's open
+                if (isOpen) {
+                    const mobileMenu = document.querySelector('.wprm-wrapper');
+                    if (mobileMenu) {
+                        mobileMenu.style.zIndex = isOpen ? '999997' : '';
+                    }
+                }
+            }
+            
+            // Add ripple effect to button when opening
             if (isOpen) {
                 const ripple = document.createElement('span');
                 ripple.className = 'avant-garde-ripple';
@@ -374,14 +502,25 @@
         // Open/close chat when custom button is clicked
         customBtn.addEventListener('click', toggleChat);
 
-        // Close when clicking outside
-        document.addEventListener('click', function(e) {
-            if (isOpen && !chatContainer.contains(e.target) && !customBtn.contains(e.target)) {
-                toggleChat();
-            }
-        });
+        // Close button for mobile
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isOpen) toggleChat();
+            });
+        }
 
-        // Periodic attention animation
+        // Close when clicking outside (desktop only)
+        if (!isMobile()) {
+            document.addEventListener('click', function(e) {
+                if (isOpen && !chatContainer.contains(e.target) && !customBtn.contains(e.target)) {
+                    toggleChat();
+                }
+            });
+        }
+
+        // Periodic attention animation (less frequent on mobile)
+        const attentionInterval = isMobile() ? 20000 : 15000;
         setInterval(() => {
             if (!isOpen) {
                 customBtn.classList.add('avant-garde-attention-grab');
@@ -389,14 +528,39 @@
                     customBtn.classList.remove('avant-garde-attention-grab');
                 }, 1500);
             }
-        }, 15000);
-
-        // Remove construction emoji functionality completely
+        }, attentionInterval);
 
         // Escape key to close
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && isOpen) {
                 toggleChat();
+            }
+        });
+
+        // Handle orientation change on mobile
+        if (isMobile()) {
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    if (isOpen) {
+                        // Briefly close and reopen to recalculate positioning
+                        chatContainer.style.transition = 'none';
+                        chatContainer.classList.remove('open');
+                        setTimeout(() => {
+                            chatContainer.style.transition = '';
+                            chatContainer.classList.add('open');
+                        }, 50);
+                    }
+                }, 100);
+            });
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (isOpen && isMobile()) {
+                // Ensure proper positioning after resize
+                setTimeout(() => {
+                    chatContainer.style.height = `calc(100vh - 145px)`;
+                }, 100);
             }
         });
     }
@@ -423,17 +587,31 @@
         document.head.appendChild(script);
     }
 
+    // Remove existing Voiceflow script if present
+    function removeExistingVoiceflow() {
+        // Remove existing voiceflow elements
+        const existingVoiceflow = document.getElementById('voiceflow-chat');
+        if (existingVoiceflow) {
+            existingVoiceflow.remove();
+        }
+        
+        // Remove existing scripts
+        const existingScripts = document.querySelectorAll('script[src*="voiceflow"]');
+        existingScripts.forEach(script => script.remove());
+    }
+
     // Initialize everything when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            createElements();
-            initializeFunctionality();
-            loadVoiceflow();
-        });
-    } else {
+    function init() {
+        removeExistingVoiceflow();
         createElements();
         initializeFunctionality();
         loadVoiceflow();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 })();
 </script>
