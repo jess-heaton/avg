@@ -2,45 +2,440 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Voiceflow Chat Demo</title>
-  <style>
-    body {
-      margin: 0;
-      background: #f5f5f5;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #chat-container {
-      width: 800px;
-      height: 650px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: white;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-      border: 1px solid #ddd;
-    }
-  </style>
+  <title>Chatbot Test</title>
 </head>
 <body>
-  <div id="chat-container"></div>
-
 <script type="text/javascript">
-  (function(d, t) {
-      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-      v.onload = function() {
-        window.voiceflow.chat.load({
-          verify: { projectID: '683630aca98ac02d68326efb' },
-          url: 'https://general-runtime.voiceflow.com',
-          versionID: 'production',
-          voice: {
-            url: "https://runtime-api.voiceflow.com"
-          }
+(function() {
+    // Inject CSS styles
+    const styles = `
+        /* Hide the default Voiceflow widget */
+        #voiceflow-chat { display: none !important; }
+
+        /* Custom animated button - refined design */
+        .avant-garde-chat-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c41e3a 0%, #dc143c 50%, #b22222 100%);
+            background-size: 200% 200%;
+            animation: avant-garde-redGradientShift 6s ease infinite, avant-garde-pulse 3s ease-in-out infinite;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(196, 30, 58, 0.3), 
+                        0 4px 16px rgba(220, 20, 60, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: visible;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Shield logo with refined styling - bigger */
+        .avant-garde-shield {
+            width: 42px;
+            height: 42px;
+            background-image: url('https://raw.githubusercontent.com/jess-heaton/avg/main/avant-garde-logo.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2)) brightness(1.1);
+            animation: avant-garde-shieldPulse 4s ease-in-out infinite;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Shield stabilizes on hover */
+        .avant-garde-chat-button:hover .avant-garde-shield {
+            animation: none;
+            transform: scale(1.1);
+        }
+
+        /* Remove the warrior icon - replaced by shield animation */
+
+        /* Hover effects - refined and smooth */
+        .avant-garde-chat-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(196, 30, 58, 0.4), 
+                        0 6px 20px rgba(220, 20, 60, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Stop all animations when widget is open */
+        .avant-garde-chat-button.widget-open {
+            animation: none !important;
+        }
+
+        .avant-garde-chat-button.widget-open .avant-garde-shield {
+            animation: none !important;
+            transform: scale(1.1);
+        }
+
+        .avant-garde-chat-button.widget-open .avant-garde-pulse-ring {
+            animation: none !important;
+        }
+
+        /* Hide text when widget is open with smoother transition */
+        .avant-garde-chat-button.widget-open .avant-garde-book-now-text {
+            opacity: 0;
+            transform: translateX(15px);
+        }
+
+        /* Text label - tighter pill shape */
+        .avant-garde-book-now-text {
+            position: absolute;
+            right: 80px;
+            background: linear-gradient(135deg, #c41e3a 0%, #dc143c 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            white-space: nowrap;
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(196, 30, 58, 0.25),
+                        0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Chat icon inside the text */
+        .avant-garde-book-now-text::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            flex-shrink: 0;
+        }
+
+        /* Text moves subtly when button is hovered */
+        .avant-garde-chat-button:hover .avant-garde-book-now-text {
+            transform: translateX(-3px);
+        }
+
+        /* Refined pulse ring */
+        .avant-garde-pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(196, 30, 58, 0.3);
+            animation: avant-garde-pulseRing 3s ease-out infinite;
+        }
+
+        /* Remove construction emoji functionality */
+
+        /* Ripple effect on click */
+        .avant-garde-ripple {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: avant-garde-ripple 0.8s ease-out;
+        }
+
+        /* The chat widget container - responsive positioning */
+        .avant-garde-chat-widget-container {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            width: min(400px, calc(100vw - 60px));
+            height: min(650px, calc(100vh - 140px));
+            max-height: calc(100vh - 140px);
+            background: transparent;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(196, 30, 58, 0.3), 
+                        0 10px 30px rgba(196, 30, 58, 0.2),
+                        0 0 40px rgba(220, 20, 60, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 999998;
+            overflow: visible;
+        }
+
+        .avant-garde-chat-widget-container.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Voiceflow embed container */
+        .avant-garde-chat-content {
+            height: 100%;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Animations */
+        @keyframes avant-garde-redGradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes avant-garde-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes avant-garde-wiggle {
+            0%, 100% { transform: rotate(-8deg) scale(1.1); }
+            25% { transform: rotate(8deg) scale(1.1); }
+            50% { transform: rotate(-8deg) scale(1.1); }
+            75% { transform: rotate(8deg) scale(1.1); }
+        }
+
+        @keyframes avant-garde-shieldPulse {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 0.9;
+            }
+            50% { 
+                transform: scale(1.15) rotate(5deg);
+                opacity: 1;
+            }
+        }
+
+        /* Remove unused iconWiggle animation */
+
+        @keyframes avant-garde-ripple {
+            to { 
+                transform: scale(4); 
+                opacity: 0; 
+            }
+        }
+
+        @keyframes avant-garde-pulseRing {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Remove unused float animation */
+
+        @keyframes avant-garde-attentionGrab {
+            0% { transform: scale(1) rotate(0deg); }
+            10% { transform: scale(1.3) rotate(-10deg); }
+            20% { transform: scale(1.3) rotate(10deg); }
+            30% { transform: scale(1.3) rotate(-10deg); }
+            40% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .avant-garde-attention-grab {
+            animation: avant-garde-attentionGrab 1.5s ease-in-out !important;
+        }
+
+        /* Mobile and small screen adjustments */
+        @media (max-width: 768px) {
+            .avant-garde-chat-button {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .avant-garde-shield {
+                width: 30px;
+                height: 30px;
+            }
+
+            .avant-garde-chat-widget-container {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 100px);
+                right: 20px;
+                bottom: 90px;
+                border-radius: 16px;
+            }
+
+            .avant-garde-book-now-text {
+                font-size: 12px;
+                padding: 6px 12px;
+                right: 70px;
+            }
+
+            .avant-garde-chat-content {
+                border-radius: 16px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .avant-garde-chat-widget-container {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 80px);
+                right: 10px;
+                bottom: 70px;
+                border-radius: 12px;
+            }
+
+            .avant-garde-chat-content {
+                border-radius: 12px;
+            }
+        }
+
+        /* Large screens */
+        @media (min-width: 1200px) {
+            .avant-garde-chat-widget-container {
+                width: 420px;
+                height: 700px;
+            }
+        }
+    `;
+
+    // Inject styles into head
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+
+    // Create HTML elements
+    function createElements() {
+        // Custom Animated Button
+        const button = document.createElement('button');
+        button.className = 'avant-garde-chat-button';
+        button.id = 'avantGardeChatBtn';
+        
+        const pulseRing = document.createElement('span');
+        pulseRing.className = 'avant-garde-pulse-ring';
+        
+        const shield = document.createElement('div');
+        shield.className = 'avant-garde-shield';
+        
+        const bookNowText = document.createElement('span');
+        bookNowText.className = 'avant-garde-book-now-text';
+        bookNowText.textContent = 'Chat here now!';
+        
+        button.appendChild(pulseRing);
+        button.appendChild(shield);
+        button.appendChild(bookNowText);
+
+        // Chat Widget Container
+        const chatContainer = document.createElement('div');
+        chatContainer.className = 'avant-garde-chat-widget-container';
+        chatContainer.id = 'avantGardeChatContainer';
+        
+        const chatContent = document.createElement('div');
+        chatContent.className = 'avant-garde-chat-content';
+        chatContent.id = 'avantGardeVoiceflowEmbed';
+        
+        chatContainer.appendChild(chatContent);
+
+        // Add to body
+        document.body.appendChild(button);
+        document.body.appendChild(chatContainer);
+    }
+
+    // Initialize functionality
+    function initializeFunctionality() {
+        const customBtn = document.getElementById('avantGardeChatBtn');
+        const chatContainer = document.getElementById('avantGardeChatContainer');
+        let isOpen = false;
+
+        function toggleChat() {
+            isOpen = !isOpen;
+            chatContainer.classList.toggle('open', isOpen);
+            
+            // Add/remove widget-open class to stop animations when open
+            customBtn.classList.toggle('widget-open', isOpen);
+            
+            // Add ripple effect to button
+            if (isOpen) {
+                const ripple = document.createElement('span');
+                ripple.className = 'avant-garde-ripple';
+                customBtn.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 800);
+            }
+        }
+
+        // Open/close chat when custom button is clicked
+        customBtn.addEventListener('click', toggleChat);
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (isOpen && !chatContainer.contains(e.target) && !customBtn.contains(e.target)) {
+                toggleChat();
+            }
         });
-      }
-      v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-  })(document, 'script');
+
+        // Periodic attention animation
+        setInterval(() => {
+            if (!isOpen) {
+                customBtn.classList.add('avant-garde-attention-grab');
+                setTimeout(() => {
+                    customBtn.classList.remove('avant-garde-attention-grab');
+                }, 1500);
+            }
+        }, 15000);
+
+        // Remove construction emoji functionality completely
+
+        // Escape key to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isOpen) {
+                toggleChat();
+            }
+        });
+    }
+
+    // Load Voiceflow
+    function loadVoiceflow() {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.voiceflow.com/widget-next/bundle.mjs';
+        script.type = 'text/javascript';
+        script.onload = function() {
+            window.voiceflow.chat.load({
+                verify: { projectID: '681be03ddbdfd714348146a6' },
+                url: 'https://general-runtime.voiceflow.com',
+                versionID: 'production',
+                voice: {
+                    url: "https://runtime-api.voiceflow.com"
+                },
+                render: {
+                    mode: 'embedded',
+                    target: document.getElementById('avantGardeVoiceflowEmbed')
+                }
+            });
+        };
+        document.head.appendChild(script);
+    }
+
+    // Initialize everything when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            createElements();
+            initializeFunctionality();
+            loadVoiceflow();
+        });
+    } else {
+        createElements();
+        initializeFunctionality();
+        loadVoiceflow();
+    }
+})();
 </script>
 </body>
 </html>
